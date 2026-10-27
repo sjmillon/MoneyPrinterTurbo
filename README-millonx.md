@@ -11,7 +11,7 @@ Rama `millonx-branding`. Vídeos verticales 9:16 con el estilo de Sergio Millón
 | Subtítulos | Anton 78 px, blanco cálido `#F6F1E8` con contorno 6 px `#141722`, posición al 80 % de la altura (bajo la tarjeta y por encima de la interfaz de X/TikTok), sin fondo, frase a frase |
 | Voz | `es-ES-AlvaroNeural` (Edge TTS), velocidad 1.1 por defecto, configurable con `--voice-rate` |
 | Vídeo | sin transiciones de entrada, concatenación secuencial, imagen estática |
-| Música | volumen 0,12 |
+| Música | pista propia **«Pulso Millón X»** (`resource/songs/millonx_pulse.mp3`, generada con `app/branding/music.py`, CC0 1.0), `bgm_type=custom`, volumen 0,12. Ya no se usan las pistas de upstream |
 | Guion literal | `--literal-script`: el texto de `--video-script` se usa palabra por palabra; no se llama al LLM ni para el guion ni para los términos |
 
 Cualquier opción que pases explícitamente en la CLI gana al preset.
@@ -31,7 +31,7 @@ python cli.py --brand millonx --literal-script \
 ```
 Formato de escena: `{"accent": "red", "kicker": "$ANT · IPO", "lines": [["-80.700 M$", 190, "red", 60]]}`; cada línea es `[texto, tamaño_máx, color, separación]`.
 
-Consejo: escribe las cifras en el guion con letras ("ochenta mil millones") para que la voz las lea bien; en la tarjeta van en número.
+Cifras: en el motor v2 escribe en `say` la misma cifra que sale en pantalla ("80.700 millones", "72.400"); Edge TTS es-ES la lee bien ("ochenta mil setecientos") y la voz y la tarjeta dicen lo mismo.
 
 ## Motor de shorts v2 (`app/branding/shorts.py`)
 Es el renderizador recomendado para clips cortos con ritmo de creador. Es independiente del pipeline upstream (task → video.combine_videos → video.generate_video con moviepy), que solo sabe hacer tarjetas estáticas con zoom, subtítulos por frase en SRT, música a volumen fijo y nada de SFX. Aquí cada fotograma se dibuja con PIL a 1080x1920 y 30 fps y se envía por tubería a ffmpeg (libx264 crf 19, AAC 192k, faststart).
@@ -39,7 +39,7 @@ Es el renderizador recomendado para clips cortos con ritmo de creador. Es indepe
 ```bash
 .venv/bin/python -m app.branding.shorts tools/millonx_ant_v2.json -o millonx_ant_v2.mp4 \
   --voice es-ES-AlvaroNeural --rate 15 --pitch +3Hz \
-  --music resource/songs/output019.mp3 --music-db -3 --max-duration 30 \
+  --music resource/songs/millonx_pulse.mp3 --music-db -12 --max-duration 30 \
   --keep storage/millonx_ant_v2_work      # deja voice.wav, sfx.wav, mix.wav y timeline.json
 ```
 
@@ -51,7 +51,7 @@ Es el renderizador recomendado para clips cortos con ritmo de creador. Es indepe
 | Movimiento constante | Ken Burns por escena, punch-in al entrar cada escena (10 %), cada línea (3,5 %) y cada palabra `punch` (6 %), deriva suave y whip-pan con desenfoque direccional en los cortes | writepanda.ai/blog/hormozi-style-shorts-editing |
 | Cifras animadas | `count: {from, dur}` con ease-out y separador de miles con punto | motioncheatcode.com/guides/animated-charts-and-counters; Humphrey Yang (fortune.com 2020/03/21) |
 | SFX | Sintetizados con numpy en `app/branding/sfx.py` (CC0, hechos aquí): impacto, whoosh en cada corte, pops con variación de tono al aparecer cada línea, ticks durante los contadores y un riser antes del cierre | woven.video/guides/add-sound-effects-to-video; faviovazquez.github.io/showtime/docs/sound-design.html |
-| Música con ducking | sidechaincompress con la voz como llave (ratio 4, ataque 20 ms, release 400 ms). La música queda unos 12 dB por debajo de la voz y el máster sale con loudnorm a -14 LUFS | Guía de ducking de CapCut; tryproduck/produck-skills SOUND.md |
+| Música con ducking | Pista propia «Pulso Millón X» desde el segundo 0 (`--music-start`), `--music-db -12` y sidechaincompress con la voz como llave (ratio 4, ataque 20 ms, release 400 ms). La música queda unos 17 dB por debajo de la voz (medido: voz -17,6 LUFS, música ducked -34,3 LUFS) y el máster sale con loudnorm a -14 LUFS | Guía de ducking de CapCut; tryproduck/produck-skills SOUND.md |
 | Barra de progreso | Barra de 12 px arriba (pista navy, relleno naranja, punto blanco). Junto con la píldora de kicker indica en qué parte del vídeo estás | videohead.io; writepanda.ai |
 | Loop | Los últimos 5 fotogramas se funden con el inicio, sin subtítulos y con whip | asendify.co; soundcache.io |
 | B-roll opcional | `"broll": "términos"` (Pexels, solo si `pexels_api_keys` está configurado en config.toml) o `"broll_file": "ruta.mp4"`. Se recorta para cubrir el lienzo, se repite en bucle y se oscurece con un tinte navy para que el texto se lea | Graham Stephan: B-roll funcional (blog.editorduel.com) |
@@ -61,10 +61,10 @@ La firma (píldora MILLÓN X / @TheMillonX) y la paleta salen de `app/branding/m
 ### Formato de escenas v2
 ```json
 {"scenes": [
-  {"say": "Anthropic ha perdido 80.000 millones en seis meses. ¿Burbuja?",
+  {"say": "Anthropic ha perdido 80.700 millones en seis meses. ¿Burbuja?",
    "hook": true, "accent": "red", "kicker": "$ANT · IPO ANTHROPIC", "punch": ["Burbuja"],
    "lines": [{"text": "-80.700 M$", "size": 200, "color": "red", "cue": "Anthropic"},
-             {"text": "72.400 M$", "size": 180, "color": "orange", "cue": "72.000",
+             {"text": "72.400 M$", "size": 180, "color": "orange", "cue": "72.400",
               "count": {"from": 0, "dur": 0.9}}]}
 ]}
 ```
@@ -75,10 +75,17 @@ La firma (píldora MILLÓN X / @TheMillonX) y la paleta salen de `app/branding/m
 
 ### Límites conocidos
 - Edge TTS no tiene estilos expresivos y en es-ES solo hay una voz masculina (Álvaro). La energía sale de la velocidad (+15 %), el tono (+3 Hz), la EQ con compresión y el recorte de silencios.
-- La música de `resource/songs` viene de upstream y no tiene licencia documentada. Para publicar, usa una pista con licencia propia.
 - El motor no pasa por `cli.py` ni por la WebUI.
 
+## Música sin derechos de terceros
+- **Pista:** «Pulso Millón X», `resource/songs/millonx_pulse.mp3`. Electrónica / lo-fi enérgica a 120 BPM en La menor (Am–F–C–G), 32 s + cola: kick a negras con sidechain (bombeo), palmada en 2 y 4, charles con swing, bajo sierra filtrado, pad supersaw, arpegio pluck a semicorcheas, saturación suave y polvo de vinilo. Lleva un hueco de -3 dB en 1–4 kHz para que la voz respire.
+- **Origen:** obra original sintetizada por `app/branding/music.py` (solo numpy + ffmpeg para codificar). Sin muestras, loops ni presets de terceros. La semilla es fija, así que `python -m app.branding.music` regenera el mismo archivo bit a bit, y el motor la regenera si falta.
+- **Licencia:** CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/). Como es creación propia, no hay ningún tercero que pueda reclamarla ni coincidencias en Content ID. Detalle en `resource/songs/LICENSES.md`.
+- Las pistas `output0xx.mp3` de upstream no tienen licencia documentada y el preset Millón X ya no las usa.
+
 ## Archivos
+- `app/branding/music.py`: síntesis de la pista «Pulso Millón X» (CC0).
+- `resource/songs/millonx_pulse.mp3` y `resource/songs/LICENSES.md`: pista y licencias.
 - `app/branding/millonx.py`: preset (paleta, fuentes, voz, subtítulos, música).
 - `app/branding/cards.py`: generador de tarjetas.
 - `app/branding/shorts.py`: motor de shorts v2 (karaoke, cámara, SFX, ducking, progreso, contadores, B-roll).

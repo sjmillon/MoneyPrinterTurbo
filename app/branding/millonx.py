@@ -53,7 +53,10 @@ MILLONX: dict[str, Any] = {
     "video_transition_mode": None,   # sin transiciones de entrada
     "video_concat_mode": "sequential",
     "image_motion": "static",
-    # Música
+    # Música: pista propia «Pulso Millón X» (app/branding/music.py, CC0, sin
+    # derechos de terceros). Nunca se usa el sorteo de resource/songs de upstream.
+    "bgm_type": "custom",
+    "bgm_file": "millonx_pulse.mp3",
     "bgm_volume": 0.12,
     # Subtítulos
     "subtitle_enabled": True,
@@ -79,6 +82,9 @@ def apply_brand(params_kwargs: dict, brand: str, explicit: Iterable[str] = ()) -
         raise ValueError(f"unknown brand preset: {brand}")
     explicit = set(explicit)
     for key, value in preset.items():
+        # si el usuario eligió otro modo de música, no le colamos la pista de marca
+        if key == "bgm_file" and "bgm_type" in explicit:
+            continue
         if key not in explicit:
             params_kwargs[key] = value
     return params_kwargs

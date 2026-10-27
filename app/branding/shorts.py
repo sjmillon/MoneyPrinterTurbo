@@ -45,6 +45,7 @@ from app.branding.millonx import (ACCENTS, BG, BODY_FONT, GREY, HANDLE, HEADLINE
 
 W, H = 1080, 1920
 FPS = 30
+DEFAULT_MUSIC = "resource/songs/millonx_pulse.mp3"   # pista propia CC0 (app/branding/music.py)
 SR = sfx.SR
 MAX_W = 940
 CAPTION_Y = 1470          # centro de los subtítulos (zona libre entre tarjeta y firma)
@@ -173,7 +174,7 @@ def load_scenes(path) -> list[Scene]:
 # --------------------------------------------------------------------------- voz
 @dataclass
 class Word:
-    text: str        # tal cual la devuelve Edge (puede ser "80.000 millones")
+    text: str        # tal cual la devuelve Edge (puede ser "80.700 millones")
     shown: str       # con la puntuación del guion (¿?¡!)
     start: float
     end: float
@@ -708,7 +709,7 @@ def build_sfx(r: Renderer, T):
     return tr.render(T)
 
 
-def mix(voice_wav, sfx_wav, music, out_wav, T, music_db=-3.0, music_start=8.0):
+def mix(voice_wav, sfx_wav, music, out_wav, T, music_db=-12.0, music_start=0.0):
     fc = (
         "[0:a]highpass=f=75,equalizer=f=220:t=q:w=1:g=-2,equalizer=f=3200:t=q:w=1.2:g=3.5,"
         "equalizer=f=9000:t=q:w=1:g=1.5,acompressor=threshold=-22dB:ratio=3.5:attack=4:"
@@ -716,7 +717,7 @@ def mix(voice_wav, sfx_wav, music, out_wav, T, music_db=-3.0, music_start=8.0):
     )
     inputs = ["-i", voice_wav, "-i", sfx_wav]
     if music and os.path.exists(music):
-        inputs += ["-ss", f"{music_start}", "-i", music]
+        inputs += (["-ss", f"{music_start}"] if music_start else []) + ["-i", music]
         fc += (f"[2:a]aformat=channel_layouts=mono,aresample={SR},atrim=duration={T:.3f},"
                f"volume={music_db}dB,afade=t=in:d=0.15,afade=t=out:st={max(0, T-0.8):.3f}:d=0.8[m];"
                "[m][key]sidechaincompress=threshold=0.03:ratio=4:attack=20:release=400:"
@@ -731,8 +732,8 @@ def mix(voice_wav, sfx_wav, music, out_wav, T, music_db=-3.0, music_start=8.0):
 
 # --------------------------------------------------------------------------- orquestación
 def build(scenes_path, out, voice="es-ES-AlvaroNeural", rate=15, pitch="+3Hz", volume="+0%",
-          music="resource/songs/output019.mp3", max_duration=30.0, keep_dir=None,
-          music_db=-3.0):
+          music=DEFAULT_MUSIC, max_duration=30.0, keep_dir=None,
+          music_db=-12.0, music_start=0.0):
     scenes = load_scenes(scenes_path)
     script = " ".join(s.say for s in scenes)
     work = keep_dir or tempfile.mkdtemp(prefix="millonx_shorts_")
@@ -759,7 +760,10 @@ def build(scenes_path, out, voice="es-ES-AlvaroNeural", rate=15, pitch="+3Hz", v
     sfx_wav = os.path.join(work, "sfx.wav")
     write_wav(sfx_wav, build_sfx(r, T))
     mix_wav = os.path.join(work, "mix.wav")
-    mix(voice_wav, sfx_wav, music, mix_wav, T, music_db=music_db)
+    if music and not os.path.exists(music) and os.path.abspath(music) == os.path.abspath(DEFAULT_MUSIC):
+        from app.branding import music as music_gen       # se regenera de forma determinista
+        music_gen.write(music)
+    mix(voice_wav, sfx_wav, music, mix_wav, T, music_db=music_db, music_start=music_start)
 
     n = int(math.ceil(T * FPS))
     loop_frames = 5
@@ -809,15 +813,18 @@ def main(argv=None):
     ap.add_argument("--voice", default="es-ES-AlvaroNeural")
     ap.add_argument("--rate", type=int, default=15, help="velocidad Edge TTS en %% (+15 = 1,15x)")
     ap.add_argument("--pitch", default="+3Hz")
-    ap.add_argument("--music", default="resource/songs/output019.mp3",
+    ap.add_argument("--music-start", type=float, default=0.0,
+                    help="segundo de la pista en el que empieza la música (0 para la pista propia)")
+    ap.add_argument("--music", default=DEFAULT_MUSIC,
                     help="'' para sin música")
-    ap.add_argument("--music-db", type=float, default=-3.0,
-                    help="ganancia de la música antes del ducking (≈12 dB bajo la voz)")
+    ap.add_argument("--music-db", type=float, default=-12.0,
+                    help="ganancia de la música antes del ducking; con la pista propia (-14 LUFS) -12 dB deja la música ~17 dB bajo la voz, igual que en la v2")
     ap.add_argument("--max-duration", type=float, default=30.0)
     ap.add_argument("--keep", default=None, help="carpeta para dejar audio/timeline intermedios")
     a = ap.parse_args(argv)
     build(a.scenes, a.out, a.voice, a.rate, a.pitch, music=a.music,
-          max_duration=a.max_duration, keep_dir=a.keep, music_db=a.music_db)
+          max_duration=a.max_duration, keep_dir=a.keep, music_db=a.music_db,
+          music_start=a.music_start)
 
 
 if __name__ == "__main__":
