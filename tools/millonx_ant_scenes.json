@@ -1,0 +1,7 @@
+[
+ {"accent":"red","kicker":"$ANT · IPO Anthropic","lines":[["-80.700 M$",190,"red",60],["EN 6 MESES",130,"white",0]]},
+ {"accent":"orange","kicker":"$ANT · IPO Anthropic","lines":[["72.400 M$",170,"orange",30],["= contabilidad",110,"white",110],["Pérdida real:",100,"grey",30],["693 M$",190,"green",0]]},
+ {"accent":"green","kicker":"$ANT · IPO Anthropic","lines":[["Ingresos:",110,"grey",50],["1.200",150,"white",55],["→",150,"green",55],["16.300 M$",170,"green",0]]},
+ {"accent":"sky","kicker":"$ANT · IPO Anthropic","lines":[["No se valora",120,"white",20],["la factura.",120,"white",110],["Se valora",130,"orange",20],["el impacto.",130,"orange",0]]},
+ {"accent":"orange","kicker":"$ANT · Nasdaq · noviembre","lines":[["$ANT:",220,"white",70],["¿dentro",150,"green",20],["o fuera?",150,"red",0]]}
+]

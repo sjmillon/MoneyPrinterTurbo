@@ -12,15 +12,26 @@ from typing import Any, Iterable
 from app.utils import utils
 
 # --- Paleta -----------------------------------------------------------------
-BG = (12, 14, 22)          # fondo casi negro azulado
-WHITE = (245, 245, 250)
-GREY = (170, 175, 190)
-RED = (255, 70, 70)        # pérdidas / alerta
-GREEN = (60, 230, 140)     # ganancias / dato bueno
-YELLOW = (255, 200, 60)    # acento de marca (el "X")
-VIOLET = (120, 110, 255)   # tesis / opinión
+# Sacada de la identidad pública de Sergio en X (@TheMillonX), no inventada:
+#  - avatar: americana azul marino (#2D3142 dominante) y camisa blanca
+#  - banner: despegue de Starship, llama naranja (#D99350 medio) y cielo azul (#57809C)
+# Rojo/verde se mantienen sólo como semántica de datos (pérdida / ganancia).
+NAVY = (45, 49, 66)        # #2D3142, americana del avatar
+BG = (20, 23, 34)          # #141722, marino oscurecido para fondo de vídeo
+WHITE = (246, 241, 232)    # #F6F1E8, blanco cálido (nubes del banner)
+GREY = (176, 184, 196)     # #B0B8C4
+ORANGE = (242, 140, 56)    # #F28C38, llama del Starship (acento de marca)
+SKY = (111, 163, 199)      # #6FA3C7, cielo del banner (tesis / opinión)
+RED = (235, 87, 87)        # #EB5757 pérdidas
+GREEN = (72, 199, 142)     # #48C78E ganancias
 
-ACCENTS = {"red": RED, "green": GREEN, "yellow": YELLOW, "violet": VIOLET, "white": WHITE, "grey": GREY}
+# Alias de compatibilidad: "yellow" -> naranja de marca, "violet" -> azul cielo
+YELLOW = ORANGE
+VIOLET = SKY
+ACCENTS = {"red": RED, "green": GREEN, "orange": ORANGE, "sky": SKY, "navy": NAVY,
+           "yellow": ORANGE, "violet": SKY, "white": WHITE, "grey": GREY}
+
+HANDLE = "@TheMillonX"     # firma en tarjetas
 
 # --- Tipografías (SIL OFL 1.1, licencias en resource/fonts/licenses) -------
 HEADLINE_FONT = "Anton-Regular.ttf"
@@ -48,8 +59,8 @@ MILLONX: dict[str, Any] = {
     "subtitle_enabled": True,
     "font_name": HEADLINE_FONT,
     "font_size": 78,
-    "text_fore_color": "#FFFFFF",
-    "stroke_color": "#0C0E16",
+    "text_fore_color": "#F6F1E8",
+    "stroke_color": "#141722",
     "stroke_width": 6,
     "subtitle_position": "custom",
     "custom_position": 80.0,     # bajo las tarjetas, por encima de la UI de X/TikTok

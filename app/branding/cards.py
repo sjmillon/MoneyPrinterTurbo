@@ -16,7 +16,7 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from app.branding.millonx import ACCENTS, BG, BODY_FONT, GREY, HEADLINE_FONT, YELLOW, WHITE, font_path
+from app.branding.millonx import ACCENTS, BG, BODY_FONT, GREY, HANDLE, HEADLINE_FONT, NAVY, ORANGE, WHITE, font_path
 
 W, H = 1080, 1920
 MAX_W = 940
@@ -57,11 +57,15 @@ def background(accent, kicker=""):
     if kicker:
         d.text((70, 90), kicker.upper(), font=_body(34), fill=GREY)
     # firma de marca abajo, fuera de la zona de subtítulos
-    f = _body(30)
-    sig = "MILLÓN"
-    x = 70
-    d.text((x, H - 110), sig, font=f, fill=WHITE)
-    d.text((x + f.getlength(sig + " "), H - 110), "X", font=f, fill=YELLOW)
+    f = _body(32)
+    # firma: "MILLÓN" blanco + "X" naranja llama + handle de X, sobre pastilla marino
+    d.rounded_rectangle([50, H - 130, W - 50, H - 60], radius=35, fill=NAVY)
+    x, y = 85, H - 115
+    d.text((x, y), "MILLÓN", font=f, fill=WHITE)
+    x += f.getlength("MILLÓN ")
+    d.text((x, y), "X", font=f, fill=ORANGE)
+    hf = _body(30)
+    d.text((W - 85 - hf.getlength(HANDLE), y + 2), HANDLE, font=hf, fill=GREY)
     return im
 
 
@@ -89,7 +93,7 @@ def render_scenes(scenes, out_dir):
     paths = []
     for i, s in enumerate(scenes, 1):
         p = os.path.join(out_dir, f"card{i:02d}.png")
-        render(p, s.get("accent", "yellow"), s["lines"], s.get("kicker", ""))
+        render(p, s.get("accent", "orange"), s["lines"], s.get("kicker", ""))
         paths.append(p)
     return paths
 

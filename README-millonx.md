@@ -5,10 +5,10 @@ Rama `millonx-branding`. Vídeos verticales 9:16 con el estilo de Sergio Millón
 ## Qué incluye
 | Elemento | Valor |
 |---|---|
-| Paleta | fondo `#0C0E16`, blanco `#F5F5FA`, gris `#AAAFBE`, rojo `#FF4646` (pérdidas), verde `#3CE68C` (ganancias), amarillo `#FFC83C` (acento / "X"), violeta `#786EFF` (opinión) |
+| Paleta | basada en el perfil de X [@TheMillonX](https://x.com/TheMillonX): fondo marino `#141722` (de la americana del avatar, `#2D3142`), naranja llama `#F28C38` (Starship del banner, acento de marca y la "X"), azul cielo `#6FA3C7` (banner, opinión), blanco cálido `#F6F1E8`, gris `#B0B8C4`; rojo `#EB5757`/verde `#48C78E` sólo para pérdidas/ganancias |
 | Tipografía | **Anton** (titulares y subtítulos) y **Montserrat ExtraBold** (etiquetas). Ambas SIL OFL 1.1, licencias en `resource/fonts/licenses/` |
-| Tarjetas por escena | fondo oscuro con halos difuminados del color de acento, barra superior de acento, antetítulo (kicker) gris, cifras grandes con sombra y firma "MILLÓN X" abajo |
-| Subtítulos | Anton 78 px, blanco con contorno 6 px `#0C0E16`, posición al 80 % de la altura (bajo la tarjeta y por encima de la interfaz de X/TikTok), sin fondo, frase a frase |
+| Tarjetas por escena | fondo oscuro con halos difuminados del color de acento, barra superior de acento, antetítulo (kicker) gris, cifras grandes con sombra y pastilla marino abajo con "MILLÓN X" (X en naranja) y el handle @TheMillonX |
+| Subtítulos | Anton 78 px, blanco cálido `#F6F1E8` con contorno 6 px `#141722`, posición al 80 % de la altura (bajo la tarjeta y por encima de la interfaz de X/TikTok), sin fondo, frase a frase |
 | Voz | `es-ES-AlvaroNeural` (Edge TTS), velocidad 1.1 por defecto, configurable con `--voice-rate` |
 | Vídeo | sin transiciones de entrada, concatenación secuencial, imagen estática |
 | Música | volumen 0,12 |
@@ -38,3 +38,6 @@ Consejo: escribe las cifras en el guion con letras ("ochenta mil millones") para
 - `app/branding/cards.py`: generador de tarjetas.
 - `cli.py`: opciones `--brand` y `--literal-script`.
 - `app/models/schema.py`, `app/services/task.py`: campo `literal_script` y salto del LLM.
+
+## Origen de la marca
+No hay manual de marca, logo ni tipografía definidos (revisado Notion y el disco). La paleta sale del avatar y el banner públicos de X de @TheMillonX; la tipografía sigue siendo Anton (titulares) + Montserrat ExtraBold (texto), ambas SIL OFL. Acentos admitidos en escenas: `orange`, `sky`, `red`, `green`, `navy`, `white`, `grey` (`yellow`/`violet` son alias de `orange`/`sky`).
