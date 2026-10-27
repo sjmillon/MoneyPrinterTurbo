@@ -312,6 +312,24 @@ Batch manifests:
 
     content_group = parser.add_argument_group("script and content")
     content_group.add_argument(
+        "--brand",
+        choices=["millonx"],
+        default=None,
+        help=(
+            "apply a brand preset (voice, subtitles, music, transitions); "
+            "options passed explicitly still win"
+        ),
+    )
+    content_group.add_argument(
+        "--literal-script",
+        action="store_true",
+        default=False,
+        help=(
+            "use --video-script word for word: never call the LLM for the "
+            "script or the search terms"
+        ),
+    )
+    content_group.add_argument(
         "--video-subject",
         default="",
         help="video topic; required unless --video-script is provided",
@@ -725,6 +743,18 @@ Batch manifests:
         ),
     )
     args = parser.parse_args(argv)
+    # Record which destinations were typed explicitly so brand presets never
+    # override them.
+    tokens = list(sys.argv[1:] if argv is None else argv)
+    explicit = set()
+    for action in parser._actions:
+        for opt in action.option_strings:
+            if any(t == opt or t.startswith(opt + "=") for t in tokens):
+                explicit.add(action.dest)
+    args.explicit_dests = explicit
+
+    if args.literal_script and not (args.video_script or "").strip():
+        parser.error("--literal-script requires --video-script")
 
     if (
         not args.batch_file
@@ -1077,6 +1107,20 @@ def build_video_params(args: argparse.Namespace) -> VideoParams:
             params_kwargs["text_background_color"] = ui_color
         elif ui_enabled is True:
             params_kwargs["text_background_color"] = True
+
+    params_kwargs["literal_script"] = bool(getattr(args, "literal_script", False))
+    if getattr(args, "brand", None):
+        from app.branding import apply_brand
+
+        explicit = set(getattr(args, "explicit_dests", ()))
+        # CLI dest names that differ from VideoParams field names.
+        aliases = {
+            "subtitle_background_enabled": "text_background_color",
+            "subtitle_background_color": "text_background_color",
+        }
+        explicit |= {aliases[d] for d in list(explicit) if d in aliases}
+        apply_brand(params_kwargs, args.brand, explicit)
+        params_kwargs["brand_preset"] = args.brand
 
     return VideoParams(**params_kwargs)
 

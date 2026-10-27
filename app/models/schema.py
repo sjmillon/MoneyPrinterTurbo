@@ -167,6 +167,9 @@ class VideoParams(BaseModel):
     paragraph_number: int = Field(default=1, ge=1, le=10)
     video_script_prompt: str = Field(default="", max_length=2000)
     custom_system_prompt: str = Field(default="", max_length=8000)
+    # Millón X: use video_script verbatim, never ask the LLM for script/terms.
+    literal_script: bool = False
+    brand_preset: str = ""
 
 
 class SubtitleRequest(BaseModel):
