@@ -54,7 +54,8 @@ Es el renderizador recomendado para clips cortos con ritmo de creador. Es indepe
 | Música con ducking | Pista propia «Pulso Millón X» desde el segundo 0 (`--music-start`), `--music-db -12` y sidechaincompress con la voz como llave (ratio 4, ataque 20 ms, release 400 ms). La música queda unos 17 dB por debajo de la voz (medido: voz -17,6 LUFS, música ducked -34,3 LUFS) y el máster sale con loudnorm a -14 LUFS | Guía de ducking de CapCut; tryproduck/produck-skills SOUND.md |
 | Barra de progreso | Barra de 12 px arriba (pista navy, relleno naranja, punto blanco). Junto con la píldora de kicker indica en qué parte del vídeo estás | videohead.io; writepanda.ai |
 | Loop | Los últimos 5 fotogramas se funden con el inicio, sin subtítulos y con whip | asendify.co; soundcache.io |
-| B-roll opcional | `"broll": "términos"` (Pexels, solo si `pexels_api_keys` está configurado en config.toml) o `"broll_file": "ruta.mp4"`. Se recorta para cubrir el lienzo, se repite en bucle y se oscurece con un tinte navy para que el texto se lea | Graham Stephan: B-roll funcional (blog.editorduel.com) |
+| B-roll opcional | `"broll": "términos"` busca primero en la carpeta local `resource/broll/millonx/` (etiquetas en `broll.json`, sin API) y solo después en Pexels si hay `pexels_api_keys`. `"broll_file": "nombre"` fija un archivo. Se recorta para cubrir el lienzo, se repite en bucle y se oscurece con un tinte navy (`"broll_dim"`, 0–1, por defecto 0,55) para que el texto se lea | Graham Stephan: B-roll funcional (blog.editorduel.com) |
+| Gráficas animadas | `"chart"` por escena (`app/branding/charts.py`): barras horizontales (`hbars`) o columnas (`vbars`) en un panel marino, cada barra crece cuando la voz dice su `cue` con contador y ticks, insignia opcional (`badge`, p. ej. "x14") con flecha. `"source"` pinta la fuente pequeña sobre la firma | motioncheatcode.com/guides/animated-charts-and-counters; estilo Humphrey Yang / Graham Stephan |
 
 La firma (píldora MILLÓN X / @TheMillonX) y la paleta salen de `app/branding/millonx.py`.
 
@@ -77,6 +78,26 @@ La firma (píldora MILLÓN X / @TheMillonX) y la paleta salen de `app/branding/m
 - Edge TTS no tiene estilos expresivos y en es-ES solo hay una voz masculina (Álvaro). La energía sale de la velocidad (+15 %), el tono (+3 Hz), la EQ con compresión y el recorte de silencios.
 - El motor no pasa por `cli.py` ni por la WebUI.
 
+## v4 · gráficas y B-roll propio (sin Pexels)
+Pexels tiene pausada la emisión de claves de API, así que el motor ya no depende de ninguna clave:
+
+```bash
+python -m app.branding.shorts tools/millonx_ant_v4.json -o millonx_ant_v4.mp4 \
+  --broll-dir resource/broll/millonx --keep storage/millonx_ant_v4_work
+```
+
+Ejemplo de escena con gráfica (solo cifras reales del S-1, el motor no inventa datos):
+```json
+{"say": "Pérdida operativa real: 693 millones.", "source": "Fuente: S-1 Anthropic (SEC)",
+ "chart": {"type": "hbars", "y": 790, "h": 560, "max": 80700, "bars": [
+   {"label": "Pérdida neta", "value": 80700, "color": "red", "prefix": "-", "instant": true, "count": false},
+   {"label": "Apunte contable", "value": 72400, "color": "orange", "instant": true, "count": false},
+   {"label": "Pérdida operativa", "value": 693, "color": "green", "cue": "693", "note": "< 1 % del total"}]}}
+```
+Campos de barra: `label`, `value`, `color`, `cue` (palabra de la voz en la que crece), `instant` (ya está al entrar), `count` (anima la cifra), `prefix`, `fmt` (`"≈{v} M$"`), `note` (texto junto a barras diminutas, que además llevan un halo que late). Con `chart` las frases se maquetan encima del panel.
+
+B-roll: cualquier `.mp4/.mov/.webm` en la carpeta sirve. Añade sus etiquetas en `broll.json` y documenta el origen en `LICENSES.md`. El de $ANT está generado con IA para el canal (centro de datos, cohete genérico, Tierra en red y sala de trading), sin personas, logos ni texto. Ver `resource/broll/millonx/LICENSES.md`.
+
 ## Música sin derechos de terceros
 - **Pista:** «Pulso Millón X», `resource/songs/millonx_pulse.mp3`. Electrónica / lo-fi enérgica a 120 BPM en La menor (Am–F–C–G), 32 s + cola: kick a negras con sidechain (bombeo), palmada en 2 y 4, charles con swing, bajo sierra filtrado, pad supersaw, arpegio pluck a semicorcheas, saturación suave y polvo de vinilo. Lleva un hueco de -3 dB en 1–4 kHz para que la voz respire.
 - **Origen:** obra original sintetizada por `app/branding/music.py` (solo numpy + ffmpeg para codificar). Sin muestras, loops ni presets de terceros. La semilla es fija, así que `python -m app.branding.music` regenera el mismo archivo bit a bit, y el motor la regenera si falta.
@@ -90,7 +111,10 @@ La firma (píldora MILLÓN X / @TheMillonX) y la paleta salen de `app/branding/m
 - `app/branding/cards.py`: generador de tarjetas.
 - `app/branding/shorts.py`: motor de shorts v2 (karaoke, cámara, SFX, ducking, progreso, contadores, B-roll).
 - `app/branding/sfx.py`: síntesis de efectos de sonido CC0.
-- `tools/millonx_ant_v2.json`: escenas del vídeo $ANT v2 (guion literal).
+- `tools/millonx_ant_v2.json`: escenas del vídeo $ANT v2/v3 (guion literal).
+- `tools/millonx_ant_v4.json`: $ANT v4 = v3 + gráficas + B-roll propio.
+- `app/branding/charts.py`: gráficas animadas (barras, columnas, insignia, fuente).
+- `resource/broll/millonx/`: B-roll propio generado con IA, `broll.json` (etiquetas y prompts) y `LICENSES.md`.
 - `cli.py`: opciones `--brand` y `--literal-script`.
 - `app/models/schema.py`, `app/services/task.py`: campo `literal_script` y salto del LLM.
 

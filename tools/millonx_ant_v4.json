@@ -1,0 +1,305 @@
+{
+ "_doc": "Guion literal $ANT v4: mismo texto, voz y cifras que la v3 (S-1 de Anthropic ante la SEC). Nuevo: 'chart' (gráficas animadas por código, app/branding/charts.py) y B-roll propio generado con IA desde resource/broll/millonx (sin API). 'source' pinta la fuente en pantalla.",
+ "scenes": [
+  {
+   "hook": true,
+   "accent": "red",
+   "kicker": "$ANT · IPO Anthropic",
+   "say": "Anthropic ha perdido 80.700 millones en seis meses. ¿Burbuja?",
+   "punch": [
+    "Burbuja"
+   ],
+   "lines": [
+    {
+     "text": "-80.700 M$",
+     "size": 200,
+     "color": "red",
+     "gap": 60
+    },
+    {
+     "text": "EN 6 MESES",
+     "size": 130,
+     "color": "white",
+     "cue": "seis"
+    }
+   ],
+   "broll": "data center ia",
+   "broll_dim": 0.32,
+   "source": "Fuente: S-1 Anthropic (SEC)"
+  },
+  {
+   "accent": "orange",
+   "kicker": "$ANT · el folleto",
+   "say": "Calma. 72.400 de esos millones son puro apunte contable.",
+   "lines": [
+    {
+     "text": "CALMA.",
+     "size": 110,
+     "color": "sky",
+     "gap": 40,
+     "cue": "Calma"
+    },
+    {
+     "text": "72.400 M$",
+     "size": 180,
+     "color": "orange",
+     "cue": "72.400",
+     "count": {
+      "from": 0,
+      "dur": 0.7
+     }
+    }
+   ],
+   "source": "Fuente: S-1 Anthropic (SEC)",
+   "chart": {
+    "type": "hbars",
+    "y": 820,
+    "h": 400,
+    "max": 80700,
+    "bars": [
+     {
+      "label": "Pérdida neta 6 meses",
+      "value": 80700,
+      "color": "red",
+      "prefix": "-",
+      "instant": true,
+      "count": false
+     },
+     {
+      "label": "Apunte contable",
+      "value": 72400,
+      "color": "orange",
+      "cue": "72.400"
+     }
+    ]
+   }
+  },
+  {
+   "accent": "green",
+   "kicker": "$ANT · pérdida operativa",
+   "say": "Pérdida operativa real: 693 millones.",
+   "lines": [
+    {
+     "text": "Pérdida real:",
+     "size": 100,
+     "color": "grey",
+     "gap": 30,
+     "cue": "Pérdida"
+    },
+    {
+     "text": "693 M$",
+     "size": 210,
+     "color": "green",
+     "cue": "693",
+     "count": {
+      "from": 80700,
+      "dur": 0.8
+     }
+    }
+   ],
+   "source": "Fuente: S-1 Anthropic (SEC)",
+   "chart": {
+    "type": "hbars",
+    "y": 790,
+    "h": 560,
+    "max": 80700,
+    "bars": [
+     {
+      "label": "Pérdida neta",
+      "value": 80700,
+      "color": "red",
+      "prefix": "-",
+      "instant": true,
+      "count": false
+     },
+     {
+      "label": "Apunte contable",
+      "value": 72400,
+      "color": "orange",
+      "instant": true,
+      "count": false
+     },
+     {
+      "label": "Pérdida operativa",
+      "value": 693,
+      "color": "green",
+      "cue": "693",
+      "note": "< 1 % del total"
+     }
+    ]
+   }
+  },
+  {
+   "accent": "green",
+   "kicker": "$ANT · ingresos",
+   "say": "Y ha facturado 16.300 millones, catorce veces más que hace un año.",
+   "punch": [
+    "catorce"
+   ],
+   "lines": [
+    {
+     "text": "Ingresos",
+     "size": 100,
+     "color": "grey",
+     "gap": 30,
+     "cue": "facturado"
+    },
+    {
+     "text": "16.300 M$",
+     "size": 180,
+     "color": "green",
+     "cue": "16.300",
+     "count": {
+      "from": 1200,
+      "dur": 0.8
+     }
+    }
+   ],
+   "source": "Fuente: S-1 Anthropic (SEC)",
+   "chart": {
+    "type": "vbars",
+    "y": 780,
+    "h": 580,
+    "max": 16300,
+    "bars": [
+     {
+      "label": "Hace un año",
+      "value": 1200,
+      "color": "grey",
+      "cue": "facturado",
+      "fmt": "≈{v} M$",
+      "count": false
+     },
+     {
+      "label": "Ahora",
+      "value": 16300,
+      "color": "green",
+      "cue": "16.300"
+     }
+    ],
+    "badge": {
+     "text": "x14",
+     "cue": "catorce",
+     "color": "orange"
+    }
+   }
+  },
+  {
+   "accent": "sky",
+   "kicker": "SpaceX · el precedente",
+   "say": "A SpaceX también la daban por muerta.",
+   "lines": [
+    {
+     "text": "SPACEX",
+     "size": 210,
+     "color": "sky",
+     "gap": 50,
+     "cue": "SpaceX"
+    },
+    {
+     "text": "la daban por",
+     "size": 100,
+     "color": "grey",
+     "gap": 30,
+     "cue": "daban"
+    },
+    {
+     "text": "MUERTA",
+     "size": 180,
+     "color": "red",
+     "cue": "muerta"
+    }
+   ],
+   "broll": "cohete lanzamiento spacex",
+   "broll_dim": 0.45
+  },
+  {
+   "accent": "orange",
+   "kicker": "La tesis",
+   "say": "Estas empresas no se valoran por lo que facturan hoy, sino por cuánto cambian el mundo.",
+   "lines": [
+    {
+     "text": "No se valora",
+     "size": 120,
+     "color": "white",
+     "gap": 20,
+     "cue": "empresas"
+    },
+    {
+     "text": "la factura.",
+     "size": 120,
+     "color": "white",
+     "gap": 100,
+     "cue": "facturan"
+    },
+    {
+     "text": "Se valora",
+     "size": 130,
+     "color": "orange",
+     "gap": 20,
+     "cue": "cuánto"
+    },
+    {
+     "text": "el impacto.",
+     "size": 130,
+     "color": "orange",
+     "cue": "mundo"
+    }
+   ],
+   "broll": "tierra mundo red",
+   "broll_dim": 0.4
+  },
+  {
+   "accent": "sky",
+   "kicker": "$ANT · Nasdaq",
+   "say": "En noviembre sale al Nasdaq.",
+   "lines": [
+    {
+     "text": "NOVIEMBRE",
+     "size": 140,
+     "color": "white",
+     "gap": 40,
+     "cue": "noviembre"
+    },
+    {
+     "text": "NASDAQ: $ANT",
+     "size": 160,
+     "color": "orange",
+     "cue": "Nasdaq"
+    }
+   ],
+   "broll": "bolsa trading nasdaq",
+   "broll_dim": 0.55
+  },
+  {
+   "accent": "orange",
+   "kicker": "$ANT · ¿dentro o fuera?",
+   "say": "¿Entras o esperas a verla caer? Te leo.",
+   "punch": [
+    "leo"
+   ],
+   "lines": [
+    {
+     "text": "¿DENTRO",
+     "size": 170,
+     "color": "green",
+     "gap": 20,
+     "cue": "Entras"
+    },
+    {
+     "text": "o fuera?",
+     "size": 170,
+     "color": "red",
+     "gap": 60,
+     "cue": "caer"
+    },
+    {
+     "text": "TE LEO EN COMENTARIOS",
+     "size": 70,
+     "color": "grey",
+     "cue": "leo"
+    }
+   ]
+  }
+ ]
+}

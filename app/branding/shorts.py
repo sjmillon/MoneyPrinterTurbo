@@ -11,8 +11,8 @@ Qué hace (ver README-millonx.md para el porqué de cada técnica):
    silencios largos entre frases (estilo jump-cut de audio) y se reajustan los
    tiempos. Si el resultado pasa de ``--max-duration`` se acelera y se repite.
 2. Imagen: cada fotograma se dibuja con Pillow a 1080x1920 y 30 fps y se manda
-   por tubería a ffmpeg (libx264). Por escena: fondo de marca (o B-roll de
-   Pexels/local), frases que entran sincronizadas con la palabra que las dice,
+   por tubería a ffmpeg (libx264). Por escena: fondo de marca (o B-roll de la
+   carpeta local resource/broll/millonx, archivo o Pexels), frases que entran sincronizadas con la palabra que las dice,
    contadores que cuentan hasta la cifra, cámara siempre en movimiento
    (Ken Burns + punch-ins en cada golpe), whip-pan en los cortes, gancho con
    slam + flash + temblor en los primeros 0,5 s y final que enlaza con el inicio.
@@ -40,12 +40,15 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from app.branding import sfx
+from app.branding.charts import Chart, source_label
 from app.branding.millonx import (ACCENTS, BG, BODY_FONT, GREY, HANDLE, HEADLINE_FONT, NAVY,
                                   ORANGE, WHITE, font_path)
 
 W, H = 1080, 1920
 FPS = 30
 DEFAULT_MUSIC = "resource/songs/millonx_pulse.mp3"   # pista propia CC0 (app/branding/music.py)
+DEFAULT_BROLL_DIR = "resource/broll/millonx"         # B-roll propio (generado con IA, ver LICENSES.md)
+VIDEO_EXT = (".mp4", ".mov", ".webm", ".mkv")
 SR = sfx.SR
 MAX_W = 940
 CAPTION_Y = 1470          # centro de los subtítulos (zona libre entre tarjeta y firma)
@@ -141,7 +144,10 @@ class Scene:
     punch: list = field(default_factory=list)
     hook: bool = False
     broll: str | None = None        # búsqueda de Pexels
-    broll_file: str | None = None   # vídeo local
+    broll_file: str | None = None   # vídeo local (ruta o nombre dentro de --broll-dir)
+    broll_dim: float = 0.55         # 0..1: cuánto tinte marino lleva el B-roll (legibilidad)
+    chart: dict | None = None       # gráfica animada (app/branding/charts.py)
+    source: str | None = None       # "Fuente: ..." pequeño en pantalla
     start: float = 0.0
     end: float = 0.0
     words: list = field(default_factory=list)
@@ -167,7 +173,9 @@ def load_scenes(path) -> list[Scene]:
         out.append(Scene(say=s["say"].strip(), lines=[_line(l) for l in s["lines"]],
                          accent=s.get("accent", "orange"), kicker=s.get("kicker", ""),
                          punch=s.get("punch", []), hook=bool(s.get("hook")),
-                         broll=s.get("broll"), broll_file=s.get("broll_file")))
+                         broll=s.get("broll"), broll_file=s.get("broll_file"),
+                         broll_dim=float(s.get("broll_dim", 0.55)), chart=s.get("chart"),
+                         source=s.get("source")))
     return out
 
 
@@ -319,7 +327,8 @@ def scene_background(accent, seed=0):
 class BrollReader:
     """Lee un vídeo (en bucle) ya recortado a 9:16 1080x1920 con tinte de marca."""
 
-    def __init__(self, path, duration):
+    def __init__(self, path, duration, dim=0.55):
+        self.dim = dim
         vf = (f"scale={int(W*1.12)}:{int(H*1.12)}:force_original_aspect_ratio=increase,"
               f"crop={int(W*1.12)}:{int(H*1.12)},fps={FPS},eq=brightness=-0.12:saturation=0.8")
         self.size = (int(W * 1.12), int(H * 1.12))
@@ -334,7 +343,7 @@ class BrollReader:
         buf = self.proc.stdout.read(n)
         if len(buf) == n:
             im = Image.frombuffer("RGB", self.size, buf, "raw", "RGB", 0, 1)
-            self.last = Image.blend(im, self.tint, 0.55)
+            self.last = Image.blend(im, self.tint, self.dim)
         return self.last
 
     def close(self):
@@ -342,6 +351,39 @@ class BrollReader:
             self.proc.kill()
         except Exception:
             pass
+
+
+def find_local_broll(query=None, name=None, folder=DEFAULT_BROLL_DIR):
+    """B-roll sin API: busca en ``folder`` (por defecto resource/broll/millonx).
+
+    - ``name``: ruta existente o nombre de archivo (con o sin extensión) dentro de la carpeta.
+    - ``query``: términos; gana el archivo cuyas etiquetas (``broll.json`` de la carpeta,
+      ``{"archivo.mp4": {"tags": [...]}}``) o nombre compartan más palabras con la búsqueda.
+    """
+    if name:
+        for cand in (name, os.path.join(folder, name),
+                     *(os.path.join(folder, name + e) for e in VIDEO_EXT)):
+            if os.path.isfile(cand):
+                return cand
+    if not query or not os.path.isdir(folder):
+        return None
+    meta = {}
+    mpath = os.path.join(folder, "broll.json")
+    if os.path.exists(mpath):
+        with open(mpath, encoding="utf-8") as fh:
+            meta = json.load(fh)
+    q = set(re.findall(r"\w+", query.lower()))
+    best, score = None, 0
+    for fn in sorted(os.listdir(folder)):
+        if not fn.lower().endswith(VIDEO_EXT):
+            continue
+        tags = set(re.findall(r"\w+", os.path.splitext(fn)[0].lower()))
+        for tg in (meta.get(fn) or {}).get("tags", []):
+            tags |= set(re.findall(r"\w+", tg.lower()))
+        sc = len(q & tags)
+        if sc > score:
+            best, score = os.path.join(folder, fn), sc
+    return best
 
 
 def fetch_pexels(query, min_dur):
@@ -480,23 +522,39 @@ class CaptionRenderer:
 
 # --------------------------------------------------------------------------- render
 class Renderer:
-    def __init__(self, scenes, words, duration, loop=True):
+    def __init__(self, scenes, words, duration, loop=True, broll_dir=DEFAULT_BROLL_DIR):
         self.scenes, self.words, self.T, self.loop = scenes, words, duration, loop
         self.groups = build_groups(words)
         self.caps = CaptionRenderer()
         self.bgs = [scene_background(color(s.accent), seed=i) for i, s in enumerate(scenes)]
         self.broll = {}
         for i, s in enumerate(scenes):
-            path = s.broll_file if s.broll_file and os.path.exists(s.broll_file) else None
+            # orden: archivo indicado -> carpeta local (sin API) -> Pexels si hay clave
+            path = find_local_broll(name=s.broll_file, folder=broll_dir) if s.broll_file else None
+            if not path and s.broll:
+                path = find_local_broll(query=s.broll, folder=broll_dir)
             if not path and s.broll:
                 path = fetch_pexels(s.broll, s.end - s.start)
             if path:
-                self.broll[i] = BrollReader(path, s.end - s.start)
+                print(f"[shorts] B-roll escena {i + 1}: {path}")
+                self.broll[i] = BrollReader(path, s.end - s.start, dim=s.broll_dim)
+        self.charts = {}
+        for i, s in enumerate(scenes):
+            if s.chart:
+                ch = Chart(dict(s.chart), color, headline, body, W)
+                ch.resolve(lambda cue, s=s: self._cue_time(s, cue), s.start)
+                self.charts[i] = ch
+        self.sources = {}
         self.sprites = {}
         self._layout()
         self.overlay_static = self._signature()
         self.kickers = {}
         self.events = []      # (t, tipo, extra) para la pista de efectos
+
+    @staticmethod
+    def _cue_time(sc, cue):
+        w = next((w for w in sc.words if cue.lower() in w.text.lower()), None)
+        return max(sc.start, w.start - 0.06) if w else None
 
     # -- maquetación de las frases de cada tarjeta
     def _layout(self):
@@ -506,7 +564,11 @@ class Renderer:
                 bb = ln.font.getbbox(ln.text)
                 ln.h = bb[3] - bb[1]
             total = sum(l.h for l in sc.lines) + sum(l.gap for l in sc.lines[:-1])
-            y = max(260, (1300 - total) // 2 + 60)
+            if sc.chart:   # las frases van encima de la gráfica
+                bottom = int(sc.chart.get("y", 860)) - 40
+                y = max(230, (230 + bottom - total) // 2)
+            else:
+                y = max(260, (1300 - total) // 2 + 60)
             for ln in sc.lines:
                 ln.y = y
                 y += ln.h + ln.gap
@@ -609,6 +671,11 @@ class Renderer:
             cy = oy + ln.y + ln.h // 2
             canvas.paste(spr, (int(cx - spr.width / 2), int(cy - spr.height / 2)), spr)
 
+        if i in self.charts:
+            canvas = canvas.convert("RGBA")
+            self.charts[i].draw(canvas, ox, oy, t, ts)
+            canvas = canvas.convert("RGB")
+
         # cámara: Ken Burns + punch-ins
         p = (t - ts) / max(0.1, sc.end - ts)
         z = 1.0 + 0.05 * p
@@ -647,6 +714,10 @@ class Renderer:
         img = img.convert("RGBA")
         img.alpha_composite(self._kicker(i), (0, 70))
         img.alpha_composite(self.overlay_static)
+        if sc.source and not clean:
+            if sc.source not in self.sources:
+                self.sources[sc.source] = source_label(sc.source, body, W)
+            img.alpha_composite(self.sources[sc.source], (0, H - 200))
         d = ImageDraw.Draw(img)
         prog = min(1.0, t / self.T)
         d.rectangle([0, 0, W, 12], fill=NAVY + (255,))
@@ -704,6 +775,13 @@ def build_sfx(r: Renderer, T):
                              gain_db=-22 - 6 * (j / n))
         for pt in sc.punch_times:
             tr.place(sfx.pop(420, 0.16), pt, gain_db=-12)
+    for ch in r.charts.values():
+        for t0, kind in ch.cue_times():
+            if kind == "badge":
+                tr.place(sfx.pop(880, 0.18), t0, gain_db=-11)
+            else:
+                for j in range(8):
+                    tr.place(sfx.tick(1500 + 90 * j), t0 + j * 0.07, gain_db=-24 - 2 * j)
     last = r.scenes[-1]
     tr.place(sfx.riser(0.7), last.start, gain_db=-16, hit=0.7)
     return tr.render(T)
@@ -733,7 +811,7 @@ def mix(voice_wav, sfx_wav, music, out_wav, T, music_db=-12.0, music_start=0.0):
 # --------------------------------------------------------------------------- orquestación
 def build(scenes_path, out, voice="es-ES-AlvaroNeural", rate=15, pitch="+3Hz", volume="+0%",
           music=DEFAULT_MUSIC, max_duration=30.0, keep_dir=None,
-          music_db=-12.0, music_start=0.0):
+          music_db=-12.0, music_start=0.0, broll_dir=DEFAULT_BROLL_DIR):
     scenes = load_scenes(scenes_path)
     script = " ".join(s.say for s in scenes)
     work = keep_dir or tempfile.mkdtemp(prefix="millonx_shorts_")
@@ -756,7 +834,7 @@ def build(scenes_path, out, voice="es-ES-AlvaroNeural", rate=15, pitch="+3Hz", v
         sc.start = 0.0 if k == 0 else sc.words[0].start - 0.12
     for k, sc in enumerate(scenes):
         sc.end = scenes[k + 1].start if k + 1 < len(scenes) else T
-    r = Renderer(scenes, words, T)
+    r = Renderer(scenes, words, T, broll_dir=broll_dir)
     sfx_wav = os.path.join(work, "sfx.wav")
     write_wav(sfx_wav, build_sfx(r, T))
     mix_wav = os.path.join(work, "mix.wav")
@@ -820,11 +898,13 @@ def main(argv=None):
     ap.add_argument("--music-db", type=float, default=-12.0,
                     help="ganancia de la música antes del ducking; con la pista propia (-14 LUFS) -12 dB deja la música ~17 dB bajo la voz, igual que en la v2")
     ap.add_argument("--max-duration", type=float, default=30.0)
+    ap.add_argument("--broll-dir", default=DEFAULT_BROLL_DIR,
+                    help="carpeta de B-roll local (sin API); ver resource/broll/millonx/broll.json")
     ap.add_argument("--keep", default=None, help="carpeta para dejar audio/timeline intermedios")
     a = ap.parse_args(argv)
     build(a.scenes, a.out, a.voice, a.rate, a.pitch, music=a.music,
           max_duration=a.max_duration, keep_dir=a.keep, music_db=a.music_db,
-          music_start=a.music_start)
+          music_start=a.music_start, broll_dir=a.broll_dir)
 
 
 if __name__ == "__main__":
