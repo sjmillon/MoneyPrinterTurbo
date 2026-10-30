@@ -1,0 +1,72 @@
+{
+ "_doc": "Guion literal Binance v1 (30-oct-2026). Solo cifras confirmadas: impacto estimado ~6.300 M$ y ~3.000 M$ congelados (comunicado oficial de Binance, 29-30 oct); 3.300 M$ sin congelar (diferencia, citada por CNBC/Reuters); récord previo Bybit 2025 ~1.500 M$ (CoinDesk/BBC). Atribución a Corea del Norte (TraderTraitor) = sospecha de TRM Labs y Chainalysis; Binance no ha atribuido el ataque. B-roll propio generado con IA (vault, drain, intrusion, frozen).",
+ "scenes": [
+  {"hook": true, "accent": "red", "kicker": "#BINANCE · HACKEO",
+   "say": "6.300 millones desaparecieron de Binance en una noche.",
+   "punch": ["noche"],
+   "lines": [
+    {"text": "-6.300 M$", "size": 210, "color": "red", "gap": 60},
+    {"text": "EN UNA NOCHE", "size": 120, "color": "white", "cue": "noche"}],
+   "broll_file": "vault.mp4", "broll_dim": 0.35,
+   "source": "Fuente: Binance (impacto estimado)"},
+  {"accent": "orange", "kicker": "Récord histórico",
+   "say": "El mayor hackeo cripto de la historia: cuatro veces Bybit.",
+   "punch": ["cuatro"],
+   "lines": [
+    {"text": "EL MAYOR", "size": 120, "color": "white", "gap": 20, "cue": "mayor"},
+    {"text": "DE LA HISTORIA", "size": 110, "color": "orange", "cue": "historia"}],
+   "source": "Fuente: Binance · CoinDesk",
+   "chart": {"type": "vbars", "y": 780, "h": 580, "max": 6300, "bars": [
+     {"label": "Bybit 2025", "value": 1500, "color": "grey", "fmt": "≈{v} M$", "instant": true, "count": false},
+     {"label": "Binance hoy", "value": 6300, "color": "red", "fmt": "≈{v} M$", "cue": "cuatro"}],
+    "badge": {"text": "x4", "cue": "Bybit", "color": "orange"}}},
+  {"accent": "sky", "kicker": "Cómo entraron",
+   "say": "Según Binance, entraron por el portátil de un ingeniero.",
+   "punch": ["portátil"],
+   "lines": [
+    {"text": "UN PORTÁTIL", "size": 150, "color": "sky", "gap": 30, "cue": "portátil"},
+    {"text": "comprometido", "size": 100, "color": "grey", "cue": "ingeniero"}],
+   "broll_file": "intrusion.mp4", "broll_dim": 0.45,
+   "source": "Fuente: investigación inicial de Binance"},
+  {"accent": "green", "kicker": "¿Dónde está el dinero?",
+   "say": "Hay unos 3.000 millones congelados. Los otros 3.300, fuera.",
+   "lines": [
+    {"text": "CONGELADO vs FUERA", "size": 90, "color": "white", "cue": "Hay"}],
+   "source": "Fuente: Binance · CNBC",
+   "chart": {"type": "hbars", "y": 760, "h": 600, "max": 6300, "bars": [
+     {"label": "Impacto total", "value": 6300, "color": "orange", "fmt": "≈{v} M$", "instant": true, "count": false},
+     {"label": "Congelado", "value": 3000, "color": "green", "fmt": "≈{v} M$", "cue": "congelados"},
+     {"label": "Sin congelar", "value": 3300, "color": "red", "fmt": "≈{v} M$", "cue": "3.300"}]}},
+  {"accent": "red", "kicker": "Principal sospechoso",
+   "say": "TRM y Chainalysis apuntan a Corea del Norte. Sospecha, no sentencia.",
+   "punch": ["Sospecha"],
+   "lines": [
+    {"text": "¿COREA DEL NORTE?", "size": 120, "color": "red", "gap": 40, "cue": "Corea"},
+    {"text": "SOSPECHA,", "size": 110, "color": "white", "gap": 10, "cue": "Sospecha"},
+    {"text": "NO SENTENCIA", "size": 110, "color": "grey", "cue": "sentencia"}],
+   "broll_file": "drain.mp4", "broll_dim": 0.5,
+   "source": "Fuente: TRM Labs · Chainalysis"},
+  {"accent": "sky", "kicker": "Retiros",
+   "say": "Binance promete cubrirlo todo, pero los retiros siguen parados.",
+   "punch": ["parados"],
+   "lines": [
+    {"text": "\"CUBRIMOS TODO\"", "size": 110, "color": "white", "gap": 40, "cue": "cubrirlo"},
+    {"text": "RETIROS", "size": 170, "color": "sky", "gap": 10, "cue": "retiros"},
+    {"text": "PARADOS", "size": 170, "color": "red", "cue": "parados"}],
+   "broll_file": "frozen.mp4", "broll_dim": 0.45,
+   "source": "Fuente: Binance (30-oct)"},
+  {"accent": "orange", "kicker": "La lección",
+   "say": "Si las claves no son tuyas, las criptos tampoco.",
+   "lines": [
+    {"text": "SIN TUS CLAVES", "size": 130, "color": "white", "gap": 30, "cue": "claves"},
+    {"text": "NO SON", "size": 150, "color": "orange", "gap": 10, "cue": "criptos"},
+    {"text": "TUS CRIPTOS", "size": 150, "color": "orange", "cue": "tampoco"}]},
+  {"accent": "orange", "kicker": "¿Exchange o wallet propia?",
+   "say": "¿Tú tienes tus criptos en un exchange? Te leo.",
+   "punch": ["leo"],
+   "lines": [
+    {"text": "¿EXCHANGE", "size": 160, "color": "red", "gap": 20, "cue": "exchange"},
+    {"text": "o wallet propia?", "size": 120, "color": "green", "gap": 60, "cue": "exchange"},
+    {"text": "TE LEO EN COMENTARIOS", "size": 70, "color": "grey", "cue": "leo"}]}
+ ]
+}

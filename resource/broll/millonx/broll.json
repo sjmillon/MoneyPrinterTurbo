@@ -1,11 +1,99 @@
 {
  "_doc": "B-roll propio de Millón X. Todo generado con IA (Grok Imagine, vía la herramienta GenerateVideo de Grok Bot) el 27-oct-2026 a partir de prompts escritos para este canal: sin personas reales, sin logos ni marcas, sin imágenes de noticias. Las escenas lo piden con \"broll\": \"términos\" (se elige el archivo con más etiquetas en común) o \"broll_file\": \"nombre\".",
- "datacenter.mp4": {"tags": ["ia", "ai", "data", "center", "servidores", "centro de datos", "anthropic", "tecnologia"],
-   "prompt": "Dark futuristic AI data center, rows of server racks with amber-orange and sky-blue LEDs, slow dolly forward, volumetric haze. No people, no text, no logos."},
- "rocket.mp4": {"tags": ["cohete", "rocket", "lanzamiento", "launch", "spacex", "espacio"],
-   "prompt": "Generic rocket silhouette lifting off at dusk against a navy sky, orange flame and exhaust clouds, camera tilts up. No people, no text, no logos, no insignia."},
- "earth.mp4": {"tags": ["tierra", "earth", "mundo", "world", "red", "network", "orbita", "impacto"],
-   "prompt": "Earth from orbit at night, warm orange city lights, sky-blue light lines linking cities like a neural network, slow push-in, sunrise rim. No text, no logos, no people."},
- "trading.mp4": {"tags": ["bolsa", "trading", "mercado", "market", "pantallas", "nasdaq", "graficos"],
-   "prompt": "Empty modern trading floor at night, walls of abstract monitors with orange/green/sky-blue candlestick charts, unreadable numbers, slow lateral dolly. No people, no readable text, no logos, no exchange names."}
+ "datacenter.mp4": {
+  "tags": [
+   "ia",
+   "ai",
+   "data",
+   "center",
+   "servidores",
+   "centro de datos",
+   "anthropic",
+   "tecnologia"
+  ],
+  "prompt": "Dark futuristic AI data center, rows of server racks with amber-orange and sky-blue LEDs, slow dolly forward, volumetric haze. No people, no text, no logos."
+ },
+ "rocket.mp4": {
+  "tags": [
+   "cohete",
+   "rocket",
+   "lanzamiento",
+   "launch",
+   "spacex",
+   "espacio"
+  ],
+  "prompt": "Generic rocket silhouette lifting off at dusk against a navy sky, orange flame and exhaust clouds, camera tilts up. No people, no text, no logos, no insignia."
+ },
+ "earth.mp4": {
+  "tags": [
+   "tierra",
+   "earth",
+   "mundo",
+   "world",
+   "red",
+   "network",
+   "orbita",
+   "impacto"
+  ],
+  "prompt": "Earth from orbit at night, warm orange city lights, sky-blue light lines linking cities like a neural network, slow push-in, sunrise rim. No text, no logos, no people."
+ },
+ "trading.mp4": {
+  "tags": [
+   "bolsa",
+   "trading",
+   "mercado",
+   "market",
+   "pantallas",
+   "nasdaq",
+   "graficos"
+  ],
+  "prompt": "Empty modern trading floor at night, walls of abstract monitors with orange/green/sky-blue candlestick charts, unreadable numbers, slow lateral dolly. No people, no readable text, no logos, no exchange names."
+ },
+ "vault.mp4": {
+  "tags": [
+   "camara",
+   "acorazada",
+   "vault",
+   "banco",
+   "robo",
+   "hackeo",
+   "exchange"
+  ],
+  "prompt": "Massive circular steel bank vault door slowly swings open, revealing an empty pitch-black interior with faint orange emergency light and drifting dust. Low angle, slow push-in. No people, no text, no logos, no symbols."
+ },
+ "drain.mp4": {
+  "tags": [
+   "monedas",
+   "coins",
+   "cripto",
+   "drenaje",
+   "fuga",
+   "robo",
+   "hackeo"
+  ],
+  "prompt": "Abstract glowing orange digital coins of light particles swirl and drain into a dark vortex, dissolving into sky-blue data particles. Plain coins without symbols. No text, no logos, no people."
+ },
+ "intrusion.mp4": {
+  "tags": [
+   "hacker",
+   "hackeo",
+   "codigo",
+   "intrusion",
+   "portatil",
+   "ciberataque",
+   "seguridad"
+  ],
+  "prompt": "Abstract cyber intrusion visualisation: unreadable glowing glyphs and network lines in a dark digital tunnel, red alert pulses, an unattended open laptop with red screen. No people, no hands, no readable text, no logos."
+ },
+ "frozen.mp4": {
+  "tags": [
+   "congelado",
+   "retiros",
+   "bloqueo",
+   "candado",
+   "frozen",
+   "pausa"
+  ],
+  "prompt": "Close-up of a padlock and heavy chain around a blank glowing screen terminal, frost creeping over it, light shifts orange to icy blue. No text or icons on screen, no people, no logos."
+ }
 }

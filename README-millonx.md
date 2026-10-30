@@ -120,3 +120,10 @@ B-roll: cualquier `.mp4/.mov/.webm` en la carpeta sirve. Añade sus etiquetas en
 
 ## Origen de la marca
 No hay manual de marca, logo ni tipografía definidos (revisado Notion y el disco). La paleta sale del avatar y el banner públicos de X de @TheMillonX; la tipografía sigue siendo Anton (titulares) + Montserrat ExtraBold (texto), ambas SIL OFL. Acentos admitidos en escenas: `orange`, `sky`, `red`, `green`, `navy`, `white`, `grey` (`yellow`/`violet` son alias de `orange`/`sky`).
+
+## Binance v1 · hackeo del 29-30 oct 2026
+```bash
+python -m app.branding.shorts tools/millonx_binance_v1.json -o millonx_binance_v1.mp4 \
+  --broll-dir resource/broll/millonx --keep storage/millonx_binance_v1_work
+```
+Mismo motor, transiciones, voz y música que $ANT v4. Cifras solo confirmadas (comunicado oficial de Binance: impacto estimado ~6.300 M$, ~3.000 M$ congelados; récord anterior Bybit 2025 ~1.500 M$). La autoría (Corea del Norte / TraderTraitor) se presenta como sospecha de TRM Labs y Chainalysis, no como hecho. B-roll nuevo generado con IA: `vault.mp4`, `intrusion.mp4`, `drain.mp4`, `frozen.mp4` (sin personas, logos ni texto).
