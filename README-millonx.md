@@ -127,3 +127,13 @@ python -m app.branding.shorts tools/millonx_binance_v1.json -o millonx_binance_v
   --broll-dir resource/broll/millonx --keep storage/millonx_binance_v1_work
 ```
 Mismo motor, transiciones, voz y música que $ANT v4. Cifras solo confirmadas (comunicado oficial de Binance: impacto estimado ~6.300 M$, ~3.000 M$ congelados; récord anterior Bybit 2025 ~1.500 M$). La autoría (Corea del Norte / TraderTraitor) se presenta como sospecha de TRM Labs y Chainalysis, no como hecho. B-roll nuevo generado con IA: `vault.mp4`, `intrusion.mp4`, `drain.mp4`, `frozen.mp4` (sin personas, logos ni texto).
+
+## MSTR v1 · caída tras resultados 3T 2026 (30 oct 2026)
+```bash
+PIXABAY_API_KEY=... python tools/pixabay_fetch.py 166289 124287 173138 3134 88697 --use "MSTR v1"
+python -m app.branding.shorts tools/millonx_mstr_v1.json -o millonx_mstr_v1.mp4 --keep storage/millonx_mstr_v1_work
+```
+- **Metraje real de Pixabay** (`tools/pixabay_fetch.py`): la clave se lee solo de `PIXABAY_API_KEY`; cada clip se recorta a 9:16 y se registra autor, id y página en `broll.json` y `LICENSES.md`.
+- **Fondo lento** (petición de Sergio): nuevas claves globales del guion `bg_motion` (0.35 = deriva y Ken Burns al 35 %) y `broll_speed` (0.45 = clips a menos de la mitad de velocidad, también por escena). Los punch-ins, el whip-pan y el flash de los cortes no cambian.
+- **Aviso fijo** con la clave `disclaimer` ("No es recomendación de inversión · estimaciones, no promesas").
+- Cifras: nota de resultados/8-K de Strategy (29-oct). Los 1.000 $ por acción son una estimación de Lawrence Lepard (jun-2026), no un precio objetivo de un banco; el consenso ronda 266 $.

@@ -146,6 +146,7 @@ class Scene:
     broll: str | None = None        # búsqueda de Pexels
     broll_file: str | None = None   # vídeo local (ruta o nombre dentro de --broll-dir)
     broll_dim: float = 0.55         # 0..1: cuánto tinte marino lleva el B-roll (legibilidad)
+    broll_speed: float | None = None  # <1 = cámara lenta del clip (None: valor global del guion)
     chart: dict | None = None       # gráfica animada (app/branding/charts.py)
     source: str | None = None       # "Fuente: ..." pequeño en pantalla
     start: float = 0.0
@@ -175,8 +176,24 @@ def load_scenes(path) -> list[Scene]:
                          punch=s.get("punch", []), hook=bool(s.get("hook")),
                          broll=s.get("broll"), broll_file=s.get("broll_file"),
                          broll_dim=float(s.get("broll_dim", 0.55)), chart=s.get("chart"),
-                         source=s.get("source")))
+                         source=s.get("source"),
+                         broll_speed=(float(s["broll_speed"]) if "broll_speed" in s else None)))
     return out
+
+
+def load_settings(path) -> dict:
+    """Ajustes globales opcionales del guion (claves de primer nivel del JSON):
+
+    - ``bg_motion`` (1.0 por defecto): escala la deriva y el Ken Burns del fondo. 0.4 = fondo lento.
+      No toca los punch-ins, el whip-pan ni el flash de los cortes (las transiciones se mantienen).
+    - ``broll_speed`` (1.0): velocidad de reproducción del B-roll; 0.5 = a mitad de velocidad.
+    - ``disclaimer``: texto pequeño fijo en pantalla (p. ej. "No es recomendación de inversión").
+    """
+    with open(path, encoding="utf-8") as fh:
+        data = json.load(fh)
+    if not isinstance(data, dict):
+        return {}
+    return {k: data[k] for k in ("bg_motion", "broll_speed", "disclaimer") if k in data}
 
 
 # --------------------------------------------------------------------------- voz
@@ -327,9 +344,10 @@ def scene_background(accent, seed=0):
 class BrollReader:
     """Lee un vídeo (en bucle) ya recortado a 9:16 1080x1920 con tinte de marca."""
 
-    def __init__(self, path, duration, dim=0.55):
+    def __init__(self, path, duration, dim=0.55, speed=1.0):
         self.dim = dim
-        vf = (f"scale={int(W*1.12)}:{int(H*1.12)}:force_original_aspect_ratio=increase,"
+        slow = f"setpts={1.0 / max(0.1, speed):.4f}*PTS," if abs(speed - 1.0) > 1e-3 else ""
+        vf = (f"{slow}scale={int(W*1.12)}:{int(H*1.12)}:force_original_aspect_ratio=increase,"
               f"crop={int(W*1.12)}:{int(H*1.12)},fps={FPS},eq=brightness=-0.12:saturation=0.8")
         self.size = (int(W * 1.12), int(H * 1.12))
         self.proc = subprocess.Popen(["ffmpeg", "-v", "error", "-stream_loop", "-1", "-i", path,
@@ -522,8 +540,13 @@ class CaptionRenderer:
 
 # --------------------------------------------------------------------------- render
 class Renderer:
-    def __init__(self, scenes, words, duration, loop=True, broll_dir=DEFAULT_BROLL_DIR):
+    def __init__(self, scenes, words, duration, loop=True, broll_dir=DEFAULT_BROLL_DIR,
+                 settings=None):
         self.scenes, self.words, self.T, self.loop = scenes, words, duration, loop
+        settings = settings or {}
+        self.motion = float(settings.get("bg_motion", 1.0))
+        self.broll_speed = float(settings.get("broll_speed", 1.0))
+        self.disclaimer = settings.get("disclaimer")
         self.groups = build_groups(words)
         self.caps = CaptionRenderer()
         self.bgs = [scene_background(color(s.accent), seed=i) for i, s in enumerate(scenes)]
@@ -537,7 +560,8 @@ class Renderer:
                 path = fetch_pexels(s.broll, s.end - s.start)
             if path:
                 print(f"[shorts] B-roll escena {i + 1}: {path}")
-                self.broll[i] = BrollReader(path, s.end - s.start, dim=s.broll_dim)
+                sp = s.broll_speed if s.broll_speed is not None else self.broll_speed
+                self.broll[i] = BrollReader(path, s.end - s.start, dim=s.broll_dim, speed=sp)
         self.charts = {}
         for i, s in enumerate(scenes):
             if s.chart:
@@ -588,6 +612,13 @@ class Renderer:
     def _signature(self):
         im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         d = ImageDraw.Draw(im)
+        if self.disclaimer:
+            fd = body(24)
+            tw = fd.getlength(self.disclaimer)
+            x0 = (W - tw) / 2
+            d.rounded_rectangle([x0 - 16, H - 252, x0 + tw + 16, H - 214], radius=19,
+                                fill=BG + (170,))
+            d.text((x0, H - 246), self.disclaimer, font=fd, fill=GREY + (235,))
         f = body(32)
         d.rounded_rectangle([50, H - 130, W - 50, H - 60], radius=35, fill=NAVY + (235,))
         x, y = 85, H - 115
@@ -678,7 +709,7 @@ class Renderer:
 
         # cámara: Ken Burns + punch-ins
         p = (t - ts) / max(0.1, sc.end - ts)
-        z = 1.0 + 0.05 * p
+        z = 1.0 + 0.05 * self.motion * p          # Ken Burns (bg_motion < 1 = más lento)
         z += 0.10 * impulse(t, ts, 0.10) if i > 0 else 0
         for ln in sc.lines[1:]:
             z += 0.035 * impulse(t, ln.t_in, 0.14)
@@ -693,7 +724,7 @@ class Renderer:
         if i > 0:
             amp = 7 * impulse(t, ts, 0.08)
             sx += amp * math.sin(t * 89)
-        drift = 18 * math.sin(t * 0.7 + i)
+        drift = 18 * self.motion * math.sin(t * 0.7 * max(self.motion, 0.3) + i)
         cw, ch = W / z, H / z
         cx = canvas.width / 2 + drift + sx
         cy = canvas.height / 2 + sy
@@ -813,6 +844,7 @@ def build(scenes_path, out, voice="es-ES-AlvaroNeural", rate=15, pitch="+3Hz", v
           music=DEFAULT_MUSIC, max_duration=30.0, keep_dir=None,
           music_db=-12.0, music_start=0.0, broll_dir=DEFAULT_BROLL_DIR):
     scenes = load_scenes(scenes_path)
+    settings = load_settings(scenes_path)
     script = " ".join(s.say for s in scenes)
     work = keep_dir or tempfile.mkdtemp(prefix="millonx_shorts_")
     os.makedirs(work, exist_ok=True)
@@ -834,7 +866,7 @@ def build(scenes_path, out, voice="es-ES-AlvaroNeural", rate=15, pitch="+3Hz", v
         sc.start = 0.0 if k == 0 else sc.words[0].start - 0.12
     for k, sc in enumerate(scenes):
         sc.end = scenes[k + 1].start if k + 1 < len(scenes) else T
-    r = Renderer(scenes, words, T, broll_dir=broll_dir)
+    r = Renderer(scenes, words, T, broll_dir=broll_dir, settings=settings)
     sfx_wav = os.path.join(work, "sfx.wav")
     write_wav(sfx_wav, build_sfx(r, T))
     mix_wav = os.path.join(work, "mix.wav")

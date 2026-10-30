@@ -1,0 +1,274 @@
+{
+ "_doc": "Guion literal MSTR v1 (30-oct-2026). Cifras: resultados 3T 2026 de Strategy (8-K/SEC y nota de prensa 29-oct): beneficio neto 19.530 M$, plusvalía en activos digitales 20.910 M$, ingresos 125,4 M$ (-3 % interanual), 848.517 BTC a 25-oct (la voz dice 'casi 850.000'). Precio: cierre 29-oct 141,62 $, ~134,4 $ en preapertura 30-oct (-5 %, CNBC/Investing.com). Salida del CFO Andrew Kang el 5-nov (Strategy). BTC ~77.500-77.900 $ (CNBC). 1.000 $ por acción = ESTIMACIÓN de Lawrence Lepard (Thoughtful Money, citado por 24/7 Wall St., 9-jun-2026: 'a $1,000 stock within a few years'); consenso de analistas ~266 $ (Stockbase, 13 analistas). No es recomendación. Fondo lento (bg_motion 0.35, B-roll al 45 % de velocidad), metraje real de Pixabay.",
+ "bg_motion": 0.35,
+ "broll_speed": 0.45,
+ "disclaimer": "No es recomendación de inversión · estimaciones, no promesas",
+ "scenes": [
+  {
+   "hook": true,
+   "accent": "red",
+   "kicker": "$MSTR · RESULTADOS",
+   "say": "Strategy ganó 19.500 millones… y su acción se hunde.",
+   "punch": [
+    "hunde"
+   ],
+   "lines": [
+    {
+     "text": "+19.500 M$",
+     "size": 200,
+     "color": "green",
+     "gap": 50
+    },
+    {
+     "text": "Y LA ACCIÓN",
+     "size": 110,
+     "color": "white",
+     "gap": 10,
+     "cue": "acción"
+    },
+    {
+     "text": "SE HUNDE",
+     "size": 150,
+     "color": "red",
+     "cue": "hunde"
+    }
+   ],
+   "broll_file": "pixabay_166289.mp4",
+   "broll_dim": 0.45,
+   "source": "Fuente: Strategy, resultados 3T 2026"
+  },
+  {
+   "accent": "orange",
+   "kicker": "¿De dónde sale?",
+   "say": "¿El truco? Casi todo es bitcoin revalorizado. Y las ventas, un 3 % menos.",
+   "punch": [
+    "truco"
+   ],
+   "lines": [
+    {
+     "text": "BENEFICIO DE PAPEL",
+     "size": 100,
+     "color": "white",
+     "cue": "truco"
+    }
+   ],
+   "source": "Fuente: Strategy (8-K, SEC)",
+   "chart": {
+    "type": "hbars",
+    "y": 700,
+    "h": 640,
+    "max": 20910,
+    "bars": [
+     {
+      "label": "Plusvalía bitcoin",
+      "value": 20910,
+      "color": "orange",
+      "fmt": "{v} M$",
+      "cue": "bitcoin"
+     },
+     {
+      "label": "Beneficio neto",
+      "value": 19530,
+      "color": "green",
+      "fmt": "{v} M$",
+      "cue": "revalorizado"
+     },
+     {
+      "label": "Ventas del negocio",
+      "value": 125,
+      "color": "red",
+      "fmt": "{v} M$ (-3 %)",
+      "cue": "ventas"
+     }
+    ]
+   }
+  },
+  {
+   "accent": "red",
+   "kicker": "Tormenta perfecta",
+   "say": "Se va el director financiero y el hackeo de Binance tumba a bitcoin.",
+   "punch": [
+    "tumba"
+   ],
+   "lines": [
+    {
+     "text": "CFO FUERA",
+     "size": 140,
+     "color": "sky",
+     "gap": 30,
+     "cue": "director"
+    },
+    {
+     "text": "HACKEO BINANCE",
+     "size": 120,
+     "color": "white",
+     "gap": 30,
+     "cue": "Binance"
+    },
+    {
+     "text": "MSTR -5 % PREAPERTURA",
+     "size": 110,
+     "color": "red",
+     "cue": "bitcoin"
+    }
+   ],
+   "broll_file": "pixabay_124287.mp4",
+   "broll_dim": 0.5,
+   "source": "Fuente: Strategy · CNBC · Investing.com"
+  },
+  {
+   "accent": "orange",
+   "kicker": "La clave",
+   "say": "Pero tienen casi 850.000 bitcoins: es bitcoin con palanca.",
+   "punch": [
+    "palanca"
+   ],
+   "lines": [
+    {
+     "text": "848.517 BTC",
+     "size": 170,
+     "color": "orange",
+     "gap": 50,
+     "cue": "tienen",
+     "count": {
+      "from": 700000,
+      "dur": 0.9
+     }
+    },
+    {
+     "text": "BITCOIN",
+     "size": 130,
+     "color": "white",
+     "gap": 10,
+     "cue": "con"
+    },
+    {
+     "text": "CON PALANCA",
+     "size": 130,
+     "color": "orange",
+     "cue": "palanca"
+    }
+   ],
+   "broll_file": "pixabay_173138.mp4",
+   "broll_dim": 0.5,
+   "source": "Fuente: Strategy (a 25-oct-2026)"
+  },
+  {
+   "accent": "green",
+   "kicker": "El potencial",
+   "say": "Si bitcoin remonta, el alcista Lawrence Lepard la ve en 1.000 dólares: siete veces lo de hoy.",
+   "punch": [
+    "Siete"
+   ],
+   "lines": [
+    {
+     "text": "¿1.000 $ POR ACCIÓN?",
+     "size": 100,
+     "color": "green",
+     "cue": "remonta"
+    }
+   ],
+   "source": "Estimación de L. Lepard (jun-2026) · consenso: Stockbase",
+   "chart": {
+    "type": "vbars",
+    "y": 760,
+    "h": 600,
+    "max": 1000,
+    "bars": [
+     {
+      "label": "Hoy",
+      "value": 134,
+      "color": "red",
+      "fmt": "≈{v} $",
+      "instant": true,
+      "count": false
+     },
+     {
+      "label": "Consenso",
+      "value": 266,
+      "color": "grey",
+      "fmt": "≈{v} $",
+      "cue": "Lepard"
+     },
+     {
+      "label": "Lepard (est.)",
+      "value": 1000,
+      "color": "green",
+      "fmt": "{v} $",
+      "cue": "dólares"
+     }
+    ],
+    "badge": {
+     "text": "x7",
+     "cue": "Siete",
+     "color": "orange"
+    }
+   }
+  },
+  {
+   "accent": "sky",
+   "kicker": "Ojo",
+   "say": "Pero la palanca corta en los dos sentidos.",
+   "punch": [
+    "sentidos"
+   ],
+   "lines": [
+    {
+     "text": "LA PALANCA",
+     "size": 140,
+     "color": "white",
+     "gap": 20,
+     "cue": "palanca"
+    },
+    {
+     "text": "CORTA EN LOS",
+     "size": 120,
+     "color": "sky",
+     "gap": 10,
+     "cue": "corta"
+    },
+    {
+     "text": "DOS SENTIDOS",
+     "size": 140,
+     "color": "red",
+     "cue": "sentidos"
+    }
+   ],
+   "broll_file": "pixabay_3134.mp4",
+   "broll_dim": 0.45
+  },
+  {
+   "accent": "orange",
+   "kicker": "¿Y tú?",
+   "say": "¿Compras la caída o te quedas fuera? Te leo.",
+   "punch": [
+    "caída",
+    "leo"
+   ],
+   "lines": [
+    {
+     "text": "¿COMPRAS",
+     "size": 160,
+     "color": "green",
+     "gap": 10,
+     "cue": "Compras"
+    },
+    {
+     "text": "LA CAÍDA?",
+     "size": 160,
+     "color": "orange",
+     "gap": 60,
+     "cue": "caída"
+    },
+    {
+     "text": "TE LEO EN COMENTARIOS",
+     "size": 70,
+     "color": "grey",
+     "cue": "leo"
+    }
+   ],
+   "broll_file": "pixabay_88697.mp4",
+   "broll_dim": 0.5
+  }
+ ]
+}
